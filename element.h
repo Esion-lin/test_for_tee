@@ -3,10 +3,10 @@
 #define INS_LEN 19
 #define COV_LEN 32
 #define POOLING_LEN 25
-#define RELU_LEN 15
-#define BN_LEN 16
-#define FC_LEN 20
-#define SHORTCUT_LEN 17
+#define RELU_LEN 22
+#define BN_LEN 22
+#define FC_LEN 26
+#define SHORTCUT_LEN 29
 /*
 S & W: 
 
@@ -40,14 +40,15 @@ pooling s:{
 }
 ReLU s:{
 	type:1
-	in_label:LABEL_LEN
+	in_label:LABEL_LEN,shape:2*2*2
 	out_label:LABEL_LEN
 	alpha:sizeof(float)
+	ex_for_tee:1
 }
 
 BN s:{
 	type:1
-	in_label:LABEL_LEN
+	in_label:LABEL_LEN,shape:2*2*2
 	out_label:LABEL_LEN
 	ex_for_tee:1
 	W_pos:POS_LEN
@@ -61,7 +62,7 @@ w: {
 }
 FC s:{
 	type:1
-	in_label:LABEL_LEN
+	in_label:LABEL_LEN,shape:2*2*2
 	out_label:LABEL_LEN
 	weight_width:sizeof(int);
 	ex_for_tee:1
@@ -72,8 +73,8 @@ w: {
 }
 SHORTCUT s:{
 	type:1
-	in_label1:LABEL_LEN
-	in_label2:LABEL_LEN
+	in_label1:LABEL_LEN,shape:2*2*2
+	in_label2:LABEL_LEN,shape:2*2*2
 	out_label:LABEL_LEN
 	ex_for_tee:1
 }
@@ -195,5 +196,7 @@ uint32_t put_data(struct Data *data, uint32_t index, uint32_t ele_size, uint8_t*
 uint32_t add_data(struct Data* data, uint8_t *name, uint32_t name_len, uint8_t* data_in, uint32_t data_len);
 uint32_t deserialize(struct Data data, uint8_t* label, uint32_t* label_len, uint8_t* data_out, uint32_t* data_len);
 uint32_t serialize(struct Data* data, uint8_t* label, uint32_t label_len, uint8_t* data_in, uint32_t data_len);
-uint32_t run_code(struct Data* data, struct Code* code);
+uint32_t code_deserialize(Code code, uint8_t* stream, uint32_t* stream_len);
+struct Code code_serialize(uint8_t* stream, uint32_t stream_len);
+uint32_t run_code(struct Data* data, struct Code* code, struct Tuple* last_tp, uint8_t* last_label);
 #endif
